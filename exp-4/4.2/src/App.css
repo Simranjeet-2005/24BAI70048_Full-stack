@@ -1,0 +1,70 @@
+body{
+    margin:0;
+    background:#f2f5f9;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+.container{
+    width:600px;
+    margin:40px auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 5px 12px rgba(0,0,0,0.2);
+}
+
+h1{
+    text-align:center;
+    color:#1f4e79;
+}
+
+.input-section{
+    display:flex;
+    gap:10px;
+}
+
+input{
+    flex:1;
+    padding:10px;
+    border:1px solid gray;
+    border-radius:5px;
+}
+
+.search{
+    width:100%;
+    margin-top:15px;
+}
+
+button{
+    padding:10px 15px;
+    border:none;
+    background:#1976d2;
+    color:white;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#125ea8;
+}
+
+.card{
+    border:1px solid #ddd;
+    border-radius:8px;
+    padding:15px;
+    margin-top:15px;
+    background:#fafafa;
+}
+
+.card button{
+    margin-right:10px;
+    margin-top:10px;
+}
+
+.delete{
+    background:#d32f2f;
+}
+
+.delete:hover{
+    background:#b71c1c;
+}
