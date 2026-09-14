@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Post Management System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f6fb;
+            color: #1f2937;
+        }
+
+        header {
+            background: #2563eb;
+            color: white;
+            text-align: center;
+            padding: 28px 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        header p {
+            margin: 8px 0 0;
+            font-size: 17px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 28px;
+            margin-bottom: 25px;
+            border-radius: 14px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #1e3a8a;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        button {
+            margin-top: 18px;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .create-btn {
+            background: #2563eb;
+        }
+
+        .check-btn {
+            background: #7c3aed;
+        }
+
+        .refresh-btn {
+            background: #16a34a;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .message {
+            margin-top: 18px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .post {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 18px;
+            margin-top: 15px;
+            background: #f8fafc;
+        }
+
+        .post h3 {
+            margin-top: 0;
+            color: #1e40af;
+        }
+
+        .post-id {
+            font-weight: bold;
+            color: #64748b;
+        }
+
+        .error-details {
+            margin-top: 10px;
+            line-height: 1.8;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #fee2e2;
+            color: #991b1b;
+            font-weight: bold;
+        }
+
+        .empty {
+            color: #64748b;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>📝 Post Management System</h1>
+    <p>Spring Boot REST API + Global Exception Handling</p>
+</header>
+
+<div class="container">
+
+    <!-- CREATE POST -->
+    <div class="card">
+        <h2>➕ Create New Post</h2>
+
+        <label for="title">Post Title</label>
+        <input
+                type="text"
+                id="title"
+                placeholder="Enter post title"
+        >
+
+        <label for="content">Post Content</label>
+        <textarea
+                id="content"
+                placeholder="Enter post content"
+        ></textarea>
+
+        <button class="create-btn" onclick="createPost()">
+            Create Post
+        </button>
+
+        <div id="createMessage" class="message"></div>
+    </div>
+
+
+    <!-- CHECK POST / EXCEPTION HANDLING -->
+    <div class="card">
+        <h2>🔍 Check Post by ID</h2>
+
+        <p>
+            Enter an existing ID to retrieve a post.
+            Enter a non-existing ID to test global exception handling.
+        </p>
+
+        <label for="postId">Post ID</label>
+
+        <input
+                type="number"
+                id="postId"
+                placeholder="Example: 999"
+                min="1"
+        >
+
+        <button class="check-btn" onclick="checkPost()">
+            Check Post
+        </button>
+
+        <div id="checkMessage" class="message"></div>
+    </div>
+
+
+    <!-- ALL POSTS -->
+    <div class="card">
+        <h2>📚 All Posts</h2>
+
+        <button class="refresh-btn" onclick="loadPosts()">
+            🔄 Refresh Posts
+        </button>
+
+        <div id="postsContainer">
+            <p class="empty">Click Refresh Posts to load posts.</p>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+
+    // ==========================
+    // CREATE POST
+    // ==========================
+
+    async function createPost() {
+
+        const title = document.getElementById("title").value.trim();
+        const content = document.getElementById("content").value.trim();
+        const message = document.getElementById("createMessage");
+
+        message.style.display = "none";
+
+        if (!title || !content) {
+            message.className = "message error";
+            message.innerHTML = "❌ Please enter both title and content.";
+            message.style.display = "block";
+            return;
+        }
+
+        const post = {
+            title: title,
+            content: content
+        };
+
+        try {
+
+            const response = await fetch("/api/posts", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(post)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+
+                message.className = "message success";
+
+                message.innerHTML = `
+                    <strong>✅ Post created successfully!</strong><br>
+                    Post ID: ${data.id}<br>
+                    Title: ${data.title}
+                `;
+
+                message.style.display = "block";
+
+                document.getElementById("title").value = "";
+                document.getElementById("content").value = "";
+
+                loadPosts();
+
+            } else {
+
+                showError(message, data);
+
+            }
+
+        } catch (error) {
+
+            message.className = "message error";
+
+            message.innerHTML = `
+                ❌ Unable to connect to Spring Boot server.
+                <br><br>
+                Make sure the application is running.
+            `;
+
+            message.style.display = "block";
+        }
+    }
+
+
+    // ==========================
+    // CHECK POST BY ID
+    // ==========================
+
+    async function checkPost() {
+
+        const id = document.getElementById("postId").value;
+        const message = document.getElementById("checkMessage");
+
+        message.style.display = "none";
+
+        if (!id) {
+
+            message.className = "message error";
+            message.innerHTML = "❌ Please enter a Post ID.";
+            message.style.display = "block";
+
+            return;
+        }
+
+        try {
+
+            const response = await fetch(`/api/posts/${id}`);
+
+            const data = await response.json();
+
+            if (response.ok) {
+
+                message.className = "message success";
+
+                message.innerHTML = `
+                    <strong>✅ Post Found</strong>
+
+                    <div class="error-details">
+                        <strong>ID:</strong> ${data.id}<br>
+                        <strong>Title:</strong> ${data.title}<br>
+                        <strong>Content:</strong> ${data.content}
+                    </div>
+                `;
+
+                message.style.display = "block";
+
+            } else {
+
+                /*
+                 * This is where we display the response
+                 * generated by GlobalExceptionHandler.
+                 */
+
+                showError(message, data);
+
+            }
+
+        } catch (error) {
+
+            message.className = "message error";
+
+            message.innerHTML = `
+                ❌ Server connection failed.
+            `;
+
+            message.style.display = "block";
+        }
+    }
+
+
+    // ==========================
+    // DISPLAY EXCEPTION
+    // ==========================
+
+    function showError(element, data) {
+
+        element.className = "message error";
+
+        element.innerHTML = `
+            <strong>❌ ${data.error || "Error"}</strong>
+
+            <div class="error-details">
+
+                <strong>Status:</strong>
+                <span class="badge">
+                    ${data.status || "N/A"}
+                </span>
+                <br>
+
+                <strong>Message:</strong>
+                ${data.message || "Something went wrong"}
+                <br>
+
+                <strong>Path:</strong>
+                ${data.path || "N/A"}
+                <br>
+
+                <strong>Time:</strong>
+                ${data.timestamp || "N/A"}
+
+                ${
+                    data.correlationId
+                    ?
+                    `<br><strong>Correlation ID:</strong> ${data.correlationId}`
+                    :
+                    ""
+                }
+
+            </div>
+        `;
+
+        element.style.display = "block";
+    }
+
+
+    // ==========================
+    // LOAD ALL POSTS
+    // ==========================
+
+    async function loadPosts() {
+
+        const container =
+            document.getElementById("postsContainer");
+
+        try {
+
+            const response =
+                await fetch("/api/posts");
+
+            const posts =
+                await response.json();
+
+            if (posts.length === 0) {
+
+                container.innerHTML =
+                    '<p class="empty">No posts available.</p>';
+
+                return;
+            }
+
+            container.innerHTML = "";
+
+            posts.forEach(post => {
+
+                const postElement =
+                    document.createElement("div");
+
+                postElement.className = "post";
+
+                postElement.innerHTML = `
+                    <div class="post-id">
+                        ID: ${post.id}
+                    </div>
+
+                    <h3>${post.title}</h3>
+
+                    <p>${post.content}</p>
+                `;
+
+                container.appendChild(postElement);
+            });
+
+        } catch (error) {
+
+            container.innerHTML = `
+                <div class="message error" style="display:block">
+                    ❌ Unable to load posts.
+                </div>
+            `;
+        }
+    }
+
+</script>
+
+</body>
+</html>
