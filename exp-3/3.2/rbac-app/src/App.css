@@ -1,0 +1,277 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f4f7fb;
+  color: #1f2937;
+}
+
+/* ---------- LOGIN ---------- */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+}
+
+.login-container {
+  width: 90%;
+  max-width: 1000px;
+  text-align: center;
+}
+
+.login-container h1 {
+  font-size: 38px;
+  margin-bottom: 10px;
+  color: #1e3a8a;
+}
+
+.login-container > p {
+  color: #64748b;
+  margin-bottom: 40px;
+}
+
+.role-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+}
+
+.role-card {
+  background: white;
+  border-radius: 18px;
+  padding: 35px 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transition: 0.3s;
+}
+
+.role-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+.role-icon {
+  font-size: 55px;
+  margin-bottom: 20px;
+}
+
+.role-card h2 {
+  margin-bottom: 10px;
+}
+
+.role-card p {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 25px;
+}
+
+.login-btn {
+  border: none;
+  padding: 12px 25px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+  width: 100%;
+  transition: 0.2s;
+}
+
+.student-btn {
+  background: #2563eb;
+}
+
+.staff-btn {
+  background: #059669;
+}
+
+.admission-btn {
+  background: #7c3aed;
+}
+
+.login-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+/* ---------- NAVBAR ---------- */
+
+.navbar {
+  background: white;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 7%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  color: #1e3a8a;
+}
+
+.logout-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ---------- HOME ---------- */
+
+.dashboard {
+  padding: 50px 7%;
+}
+
+.welcome-section {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: white;
+  padding: 35px;
+  border-radius: 20px;
+  margin-bottom: 35px;
+}
+
+.welcome-section h1 {
+  margin-bottom: 10px;
+}
+
+.role-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 7px 15px;
+  border-radius: 20px;
+  margin-top: 10px;
+}
+
+.section-title {
+  margin-bottom: 20px;
+}
+
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.dashboard-card {
+  background: white;
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+  text-decoration: none;
+  color: inherit;
+  transition: 0.3s;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+}
+
+.dashboard-card .icon {
+  font-size: 35px;
+  margin-bottom: 15px;
+}
+
+.dashboard-card h3 {
+  margin-bottom: 8px;
+}
+
+.dashboard-card p {
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* ---------- ROLE DASHBOARD ---------- */
+
+.role-dashboard {
+  padding: 50px 7%;
+}
+
+.role-header {
+  color: white;
+  padding: 35px;
+  border-radius: 20px;
+  margin-bottom: 35px;
+}
+
+.student-header {
+  background: linear-gradient(135deg, #2563eb, #60a5fa);
+}
+
+.staff-header {
+  background: linear-gradient(135deg, #059669, #34d399);
+}
+
+.admission-header {
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.action-card {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+}
+
+.action-card h3 {
+  margin-bottom: 10px;
+}
+
+.action-card p {
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.action-btn {
+  border: none;
+  padding: 10px 18px;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.blue {
+  background: #2563eb;
+}
+
+.green {
+  background: #059669;
+}
+
+.purple {
+  background: #7c3aed;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 800px) {
+  .role-cards,
+  .dashboard-cards,
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .navbar {
+    padding: 0 4%;
+  }
+
+  .dashboard,
+  .role-dashboard {
+    padding: 30px 4%;
+  }
+}
