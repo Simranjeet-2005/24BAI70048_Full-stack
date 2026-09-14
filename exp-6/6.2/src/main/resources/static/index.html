@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Experiment 6.2 - Caching & Query Optimization</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        .container {
+            width: 85%;
+            max-width: 900px;
+            margin: 25px auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 3px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 18px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .form-row input {
+            flex: 1;
+            padding: 9px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            border: none;
+            padding: 8px 14px;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .add-btn {
+            background: #16a34a;
+        }
+
+        .normal-btn {
+            background: #ef4444;
+        }
+
+        .join-btn {
+            background: #2563eb;
+        }
+
+        .cache-btn {
+            background: #7c3aed;
+        }
+
+        .native-btn {
+            background: #ea580c;
+        }
+
+        .sort-id-btn {
+            background: #1597b5;
+        }
+
+        .sort-name-btn {
+            background: #267f78;
+        }
+
+        .refresh-btn {
+            background: #475569;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            padding: 5px 12px;
+            font-size: 12px;
+        }
+
+        .query-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .sort-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        #status {
+            background: #ecfdf5;
+            border: 1px solid #d1fae5;
+            color: #166534;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th {
+            background: #eef2f7;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+        }
+
+        .empty {
+            text-align: center;
+            color: #777;
+        }
+
+        @media (max-width: 700px) {
+
+            .container {
+                width: 95%;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .form-row input,
+            .add-btn {
+                width: 100%;
+            }
+
+            .sort-buttons {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Experiment 6.2</h1>
+    <div class="subtitle">Caching & Query Optimization</div>
+
+    <!-- ADD USER -->
+    <div class="card">
+
+        <h2>Add User</h2>
+
+        <div class="form-row">
+
+            <input type="text" id="uid" placeholder="UID">
+
+            <input type="text" id="name" placeholder="Name">
+
+            <input type="text" id="city" placeholder="City">
+
+            <input type="text" id="country" placeholder="Country">
+
+            <button class="add-btn" onclick="addUser()">
+                Add User
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- QUERY TESTS -->
+    <div class="card">
+
+        <h2>Query Optimization Tests</h2>
+
+        <div class="query-buttons">
+
+            <button class="normal-btn" onclick="runQuery('normal')">
+                Normal Query
+            </button>
+
+            <button class="join-btn" onclick="runQuery('join-fetch')">
+                JOIN FETCH
+            </button>
+
+            <button class="cache-btn" onclick="runQuery('cached')">
+                Cached Query
+            </button>
+
+            <button class="native-btn" onclick="runQuery('native')">
+                Native SQL
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- SORT -->
+    <div class="card">
+
+        <h2>Sort Users</h2>
+
+        <div class="sort-buttons">
+
+            <button class="sort-id-btn" onclick="sortByID()">
+                Sort by ID
+            </button>
+
+            <button class="sort-name-btn" onclick="sortByName()">
+                Sort by Name
+            </button>
+
+            <button class="refresh-btn" onclick="loadUsers()">
+                Refresh
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- STATUS -->
+    <div id="status">
+        Ready
+    </div>
+
+
+    <!-- USER LIST -->
+    <div class="card">
+
+        <h2>User List</h2>
+
+        <table>
+
+            <thead>
+
+            <tr>
+                <th>ID</th>
+                <th>UID</th>
+                <th>Name</th>
+                <th>City</th>
+                <th>Country</th>
+                <th>Action</th>
+            </tr>
+
+            </thead>
+
+            <tbody id="userTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const API_URL = "/users";
+
+    let users = [];
+
+
+    // LOAD USERS
+    function loadUsers() {
+
+        fetch(API_URL)
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error("Failed to load users");
+                }
+
+                return response.json();
+
+            })
+            .then(data => {
+
+                users = data;
+
+                displayUsers(users);
+
+                setStatus("Users loaded successfully");
+
+            })
+            .catch(error => {
+
+                console.error(error);
+
+                setStatus("Unable to load users");
+
+            });
+    }
+
+
+    // DISPLAY USERS
+    function displayUsers(data) {
+
+        const table = document.getElementById("userTable");
+
+        table.innerHTML = "";
+
+        if (data.length === 0) {
+
+            table.innerHTML =
+                `<tr>
+                    <td colspan="6" class="empty">
+                        No users found
+                    </td>
+                </tr>`;
+
+            return;
+        }
+
+
+        data.forEach(user => {
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${user.id}</td>
+                <td>${user.uid}</td>
+                <td>${user.name}</td>
+                <td>${user.city}</td>
+                <td>${user.country}</td>
+                <td>
+                    <button
+                        class="delete-btn"
+                        onclick="deleteUser(${user.id})">
+                        Delete
+                    </button>
+                </td>
+            `;
+
+            table.appendChild(row);
+
+        });
+    }
+
+
+    // RUN QUERY
+    function runQuery(type) {
+
+        const start = performance.now();
+
+        fetch(API_URL + "/" + type)
+
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error("Query failed");
+                }
+
+                return response.json();
+
+            })
+
+            .then(data => {
+
+                const end = performance.now();
+
+                users = data.users;
+
+                displayUsers(users);
+
+                const time =
+                    Number(data.executionTimeMs).toFixed(2);
+
+                let queryName = "";
+
+                if (type === "normal") {
+                    queryName = "NORMAL QUERY";
+                }
+
+                if (type === "join-fetch") {
+                    queryName = "JOIN FETCH";
+                }
+
+                if (type === "cached") {
+                    queryName = "CACHED QUERY";
+                }
+
+                if (type === "native") {
+                    queryName = "NATIVE SQL";
+                }
+
+                setStatus(
+                    queryName +
+                    " completed in " +
+                    time +
+                    " ms"
+                );
+
+            })
+
+            .catch(error => {
+
+                console.error(error);
+
+                setStatus("Query failed");
+
+            });
+    }
+
+
+    // SORT BY ID
+    function sortByID() {
+
+        const start = performance.now();
+
+        users.sort((a, b) => a.id - b.id);
+
+        displayUsers(users);
+
+        const end = performance.now();
+
+        setStatus(
+            "SORT BY ID completed in " +
+            (end - start).toFixed(2) +
+            " ms"
+        );
+    }
+
+
+    // SORT BY NAME
+    function sortByName() {
+
+        const start = performance.now();
+
+        users.sort((a, b) =>
+            a.name.localeCompare(b.name)
+        );
+
+        displayUsers(users);
+
+        const end = performance.now();
+
+        setStatus(
+            "SORT BY NAME completed in " +
+            (end - start).toFixed(2) +
+            " ms"
+        );
+    }
+
+
+    // ADD USER
+    function addUser() {
+
+        const uid =
+            document.getElementById("uid").value.trim();
+
+        const name =
+            document.getElementById("name").value.trim();
+
+        const city =
+            document.getElementById("city").value.trim();
+
+        const country =
+            document.getElementById("country").value.trim();
+
+
+        if (!uid || !name || !city || !country) {
+
+            alert("Please fill all fields.");
+
+            return;
+        }
+
+
+        const user = {
+            uid: uid,
+            name: name,
+            city: city,
+            country: country
+        };
+
+
+        fetch(API_URL, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(user)
+
+        })
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Failed to add user");
+            }
+
+            return response.json();
+
+        })
+
+        .then(() => {
+
+            document.getElementById("uid").value = "";
+            document.getElementById("name").value = "";
+            document.getElementById("city").value = "";
+            document.getElementById("country").value = "";
+
+            loadUsers();
+
+            setStatus("User added successfully");
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+            alert("Unable to add user.");
+
+        });
+
+    }
+
+
+    // DELETE USER
+    function deleteUser(id) {
+
+        if (!confirm("Delete this user?")) {
+            return;
+        }
+
+
+        fetch(API_URL + "/" + id, {
+
+            method: "DELETE"
+
+        })
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Delete failed");
+            }
+
+            loadUsers();
+
+            setStatus("User deleted successfully");
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+            alert("Unable to delete user.");
+
+        });
+
+    }
+
+
+    // STATUS MESSAGE
+    function setStatus(message) {
+
+        document.getElementById("status").textContent = message;
+
+    }
+
+
+    // LOAD WHEN PAGE OPENS
+    loadUsers();
+
+</script>
+
+</body>
+</html>

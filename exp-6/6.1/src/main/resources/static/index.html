@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Experiment 6.1 - Pagination & Sorting REST API</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f7fa;
+            color: #222;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 25px auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 9px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            border: none;
+            border-radius: 4px;
+            padding: 9px 18px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .add-btn {
+            background: #16a34a;
+        }
+
+        .apply-btn {
+            background: #1683e8;
+            margin-top: 15px;
+        }
+
+        .delete-btn {
+            background: #e63950;
+            padding: 5px 12px;
+            font-size: 12px;
+        }
+
+        .refresh-btn {
+            background: #333;
+            float: right;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th {
+            background: #eeeeee;
+            text-align: left;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 18px;
+        }
+
+        .page-btn {
+            background: #aaa;
+        }
+
+        .page-btn:disabled {
+            background: #ddd;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            font-weight: bold;
+        }
+
+        #totalUsers {
+            color: #555;
+        }
+
+        @media (max-width: 700px) {
+            .form-row {
+                flex-direction: column;
+            }
+
+            .form-group {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Experiment 6.1</h1>
+    <div class="subtitle">Pagination & Sorting REST API</div>
+
+    <!-- Add User -->
+    <div class="card">
+        <h2>Add User</h2>
+
+        <div class="form-row">
+
+            <div class="form-group">
+                <label for="uid">UID</label>
+                <input type="text" id="uid" placeholder="Enter UID">
+            </div>
+
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" placeholder="Enter name">
+            </div>
+
+            <div>
+                <button class="add-btn" onclick="addUser()">Add User</button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Pagination & Sorting -->
+    <div class="card">
+
+        <h2>Pagination & Sorting</h2>
+
+        <div class="form-row">
+
+            <div class="form-group">
+                <label for="pageSize">Users Per Page</label>
+
+                <select id="pageSize">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                </select>
+            </div>
+
+
+            <div class="form-group">
+                <label for="sortBy">Sort By</label>
+
+                <select id="sortBy">
+                    <option value="uid">UID</option>
+                    <option value="name">Name</option>
+                </select>
+            </div>
+
+
+            <div class="form-group">
+                <label for="direction">Order</label>
+
+                <select id="direction">
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                </select>
+            </div>
+
+        </div>
+
+        <button class="apply-btn" onclick="applySettings()">Apply</button>
+
+    </div>
+
+
+    <!-- Users -->
+    <div class="card">
+
+        <button class="refresh-btn" onclick="loadUsers()">Refresh</button>
+
+        <h2>Users</h2>
+
+        <div>
+            Total Users: <span id="totalUsers">0</span>
+        </div>
+
+        <table>
+
+            <thead>
+            <tr>
+                <th>UID</th>
+                <th>Name</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+
+            <tbody id="userTable">
+            </tbody>
+
+        </table>
+
+
+        <div class="pagination">
+
+            <button id="previousBtn"
+                    class="page-btn"
+                    onclick="previousPage()">
+                ← Previous
+            </button>
+
+            <span class="page-info" id="pageInfo">
+                Page 1 of 1
+            </span>
+
+            <button id="nextBtn"
+                    class="page-btn"
+                    onclick="nextPage()">
+                Next →
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const API_URL = "/users";
+
+    let currentPage = 0;
+
+    let totalPages = 1;
+
+
+    // Load users
+    function loadUsers() {
+
+        const size = document.getElementById("pageSize").value;
+        const sortBy = document.getElementById("sortBy").value;
+        const direction = document.getElementById("direction").value;
+
+        const url =
+            `${API_URL}?page=${currentPage}` +
+            `&size=${size}` +
+            `&sortBy=${sortBy}` +
+            `&direction=${direction}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+
+                displayUsers(data);
+
+            })
+            .catch(error => {
+
+                console.error("Error:", error);
+
+                alert("Unable to load users.");
+
+            });
+    }
+
+
+    // Display users
+    function displayUsers(data) {
+
+        const table = document.getElementById("userTable");
+
+        table.innerHTML = "";
+
+        data.content.forEach(user => {
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${user.uid}</td>
+                <td>${user.name}</td>
+                <td>
+                    <button
+                        class="delete-btn"
+                        onclick="deleteUser('${user.uid}')">
+                        Delete
+                    </button>
+                </td>
+            `;
+
+            table.appendChild(row);
+
+        });
+
+
+        document.getElementById("totalUsers").textContent =
+            data.totalElements;
+
+        totalPages = data.totalPages;
+
+        document.getElementById("pageInfo").textContent =
+            `Page ${data.number + 1} of ${data.totalPages || 1}`;
+
+        document.getElementById("previousBtn").disabled =
+            data.first;
+
+        document.getElementById("nextBtn").disabled =
+            data.last;
+    }
+
+
+    // Apply pagination/sorting
+    function applySettings() {
+
+        currentPage = 0;
+
+        loadUsers();
+    }
+
+
+    // Previous page
+    function previousPage() {
+
+        if (currentPage > 0) {
+
+            currentPage--;
+
+            loadUsers();
+        }
+    }
+
+
+    // Next page
+    function nextPage() {
+
+        if (currentPage < totalPages - 1) {
+
+            currentPage++;
+
+            loadUsers();
+        }
+    }
+
+
+    // Add user
+    function addUser() {
+
+        const uid =
+            document.getElementById("uid").value.trim();
+
+        const name =
+            document.getElementById("name").value.trim();
+
+
+        if (!uid || !name) {
+
+            alert("Please enter UID and Name.");
+
+            return;
+        }
+
+
+        fetch(API_URL, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                uid: uid,
+                name: name
+            })
+
+        })
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("User already exists or request failed.");
+            }
+
+            return response.json();
+
+        })
+        .then(() => {
+
+            document.getElementById("uid").value = "";
+            document.getElementById("name").value = "";
+
+            currentPage = 0;
+
+            loadUsers();
+
+        })
+        .catch(error => {
+
+            alert(error.message);
+
+        });
+    }
+
+
+    // Delete user
+    function deleteUser(uid) {
+
+        if (!confirm("Delete user " + uid + "?")) {
+            return;
+        }
+
+
+        fetch(`${API_URL}/${uid}`, {
+
+            method: "DELETE"
+
+        })
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Delete failed.");
+            }
+
+            loadUsers();
+
+        })
+        .catch(error => {
+
+            alert(error.message);
+
+        });
+    }
+
+
+    // Load users when page opens
+    loadUsers();
+
+</script>
+
+</body>
+</html>
