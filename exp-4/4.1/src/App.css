@@ -1,0 +1,101 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#eef3ff;
+}
+
+.app{
+
+    padding:40px;
+
+}
+
+.header{
+
+    text-align:center;
+    margin-bottom:30px;
+
+}
+
+.header h1{
+
+    font-size:42px;
+    color:#3f51b5;
+
+}
+
+.header p{
+
+    color:#666;
+    margin-top:10px;
+
+}
+
+.calendar-card{
+
+    width:90%;
+    margin:auto;
+    background:white;
+    border-radius:20px;
+    padding:25px;
+
+    box-shadow:
+    0 10px 30px rgba(0,0,0,.12);
+
+}
+
+/* Reduce calendar box size */
+.fc-daygrid-day {
+    height: 60px !important;
+    min-height: 60px !important;
+}
+
+/* Smaller date numbers */
+.fc-daygrid-day-number {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* Header title */
+.fc-toolbar-title {
+    font-size: 28px !important;
+    color: #3f51b5;
+}
+
+/* Buttons */
+.fc .fc-button {
+    background: #5b6cff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 8px 14px !important;
+}
+
+.fc .fc-button:hover {
+    background: #4154e2 !important;
+}
+
+/* Event styling */
+.fc-event {
+    background: #6c63ff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 2px;
+    font-size: 13px;
+}
+
+/* Rounded calendar */
+.fc-scrollgrid {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+/* Hover effect */
+.fc-daygrid-day:hover {
+    background: #f4f7ff;
+    cursor: pointer;
+}
